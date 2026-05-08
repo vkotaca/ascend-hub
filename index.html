@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <!-- animated gradient mesh background -->
@@ -27,6 +27,12 @@
   </header>
 
   <main class="flywheel-stage" aria-label="Ascend programs">
+    <!-- spin hint, fades after first interaction -->
+    <div class="spin-hint" aria-hidden="true">
+      <span class="spin-hint-arrow">↻</span>
+      <span>Drag to spin</span>
+    </div>
+
     <!-- Decorative rings, spokes, and energy particles -->
     <svg class="flywheel-svg" viewBox="-500 -500 1000 1000" aria-hidden="true" focusable="false">
       <defs>
@@ -49,36 +55,36 @@
       <!-- soft red halo behind the center -->
       <circle cx="0" cy="0" r="290" fill="url(#centerGlow)" />
 
-      <!-- decorative rings -->
-      <g class="ring-group">
+      <!-- auto-spinning decorative outer rings + ticks (independent of user drag) -->
+      <g class="auto-spin">
         <circle cx="0" cy="0" r="460" class="ring ring-outer" />
         <circle cx="0" cy="0" r="380" class="ring ring-dashed" />
+        <g class="ticks"></g>
+      </g>
+
+      <!-- user-controlled wheel: spokes, particles, inner rings (rotates with drag) -->
+      <g class="user-wheel">
         <circle cx="0" cy="0" r="300" class="ring ring-mid" />
         <circle cx="0" cy="0" r="180" class="ring ring-inner" />
-      </g>
 
-      <!-- 4 spokes from inner ring (r=180) to mid ring (r=300) -->
-      <g class="spokes">
-        <line x1="0"    y1="-180" x2="0"    y2="-300" class="spoke" />
-        <line x1="180"  y1="0"    x2="300"  y2="0"    class="spoke" />
-        <line x1="0"    y1="180"  x2="0"    y2="300"  class="spoke" />
-        <line x1="-180" y1="0"    x2="-300" y2="0"    class="spoke" />
-      </g>
+        <g class="spokes">
+          <line x1="0"    y1="-180" x2="0"    y2="-300" class="spoke" />
+          <line x1="180"  y1="0"    x2="300"  y2="0"    class="spoke" />
+          <line x1="0"    y1="180"  x2="0"    y2="300"  class="spoke" />
+          <line x1="-180" y1="0"    x2="-300" y2="0"    class="spoke" />
+        </g>
 
-      <!-- energy particles travelling outward along each spoke -->
-      <g class="particles">
-        <circle r="6" class="particle p-top p-1"    fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-top p-2"    fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-right p-1"  fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-right p-2"  fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-bottom p-1" fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-bottom p-2" fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-left p-1"   fill="url(#particleGrad)" />
-        <circle r="6" class="particle p-left p-2"   fill="url(#particleGrad)" />
+        <g class="particles">
+          <circle r="6" class="particle p-top p-1"    fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-top p-2"    fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-right p-1"  fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-right p-2"  fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-bottom p-1" fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-bottom p-2" fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-left p-1"   fill="url(#particleGrad)" />
+          <circle r="6" class="particle p-left p-2"   fill="url(#particleGrad)" />
+        </g>
       </g>
-
-      <!-- decorative ticks (filled by JS) -->
-      <g class="ticks"></g>
     </svg>
 
     <!-- Center: curved seal text + Ascend logo -->
@@ -104,8 +110,8 @@
 
     <p class="hub-tagline">All of Ascend, in one place.</p>
 
-    <!-- 4 category cards -->
-    <article class="category category-top" style="--delay:0.10s">
+    <!-- 4 category cards (positions managed by JS for drag-to-spin) -->
+    <article class="category category-top" data-base-angle="-90" style="--delay:0.10s">
       <div class="category-inner">
         <span class="category-num">01</span>
         <span class="category-eyebrow">Summer</span>
@@ -126,7 +132,7 @@
       </div>
     </article>
 
-    <article class="category category-right" style="--delay:0.20s">
+    <article class="category category-right" data-base-angle="0" style="--delay:0.20s">
       <div class="category-inner">
         <span class="category-num">02</span>
         <span class="category-eyebrow">High School</span>
@@ -150,7 +156,7 @@
       </div>
     </article>
 
-    <article class="category category-bottom" style="--delay:0.30s">
+    <article class="category category-bottom" data-base-angle="90" style="--delay:0.30s">
       <div class="category-inner">
         <span class="category-num">03</span>
         <span class="category-eyebrow">Middle School</span>
@@ -165,7 +171,7 @@
       </div>
     </article>
 
-    <article class="category category-left" style="--delay:0.40s">
+    <article class="category category-left" data-base-angle="180" style="--delay:0.40s">
       <div class="category-inner">
         <span class="category-num">04</span>
         <span class="category-eyebrow">College Prep</span>
@@ -188,6 +194,6 @@
     <span>© <span id="year"></span> Ascend Education</span>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

@@ -32,7 +32,6 @@ body {
   position: relative;
 }
 
-/* subtle grain to give it a printed/editorial feel */
 body::before {
   content: "";
   position: fixed; inset: 0;
@@ -136,9 +135,47 @@ body::before {
   animation: fadeUp 1.2s var(--ease) 1.4s forwards;
 }
 
+/* ── SPIN HINT ── */
+.spin-hint {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, calc(-50% + 38px));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 6;
+  animation: hintFade 1s var(--ease) 2.6s forwards, hintFloat 4s ease-in-out 2.6s infinite;
+  white-space: nowrap;
+}
+.spin-hint.dismissed { animation: hintOut 0.4s var(--ease) forwards; }
+.spin-hint-arrow {
+  display: inline-block;
+  font-size: 13px;
+  animation: hintRotate 3s linear infinite;
+  transform-origin: center;
+}
+@keyframes hintFade { from { opacity: 0; } to { opacity: 0.55; } }
+@keyframes hintOut  { to   { opacity: 0; transform: translate(-50%, calc(-50% + 50px)); } }
+@keyframes hintFloat {
+  0%, 100% { transform: translate(-50%, calc(-50% + 38px)); }
+  50%      { transform: translate(-50%, calc(-50% + 44px)); }
+}
+@keyframes hintRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ── FLYWHEEL STAGE ── */
 .flywheel-stage {
-  --r: clamp(280px, 42vmin, 440px);
+  /* cap radius by both vmin (horizontal fit) AND vh (vertical fit)
+     so top/bottom cards never clip on shorter laptop viewports */
+  --r: clamp(180px, min(40vmin, 24vh), 380px);
   --logo: clamp(140px, 20vmin, 210px);
   position: relative;
   width: 100%;
@@ -146,10 +183,14 @@ body::before {
   display: grid;
   place-items: center;
   z-index: 2;
-  padding: 96px 16px;
+  padding: 72px 16px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
 }
+.flywheel-stage.dragging { cursor: grabbing; }
 
-/* SVG wheel (rings + spokes) */
+/* SVG wheel (rings + spokes + particles) */
 .flywheel-svg {
   position: absolute;
   top: 50%; left: 50%;
@@ -160,14 +201,14 @@ body::before {
   overflow: visible;
 }
 .ring { fill: none; stroke: rgba(0, 0, 0, 0.10); stroke-width: 1; }
-.ring-outer { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; }
-.ring-dashed { stroke: rgba(0, 0, 0, 0.10); stroke-dasharray: 2 8; stroke-width: 1; }
-.ring-mid { stroke: rgba(0, 0, 0, 0.07); }
-.ring-inner { stroke: rgba(188, 30, 45, 0.22); stroke-width: 1.4; }
+.ring-outer  { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; animation: spin 120s linear infinite; transform-origin: 0 0; }
+.ring-dashed { stroke: rgba(0, 0, 0, 0.10); stroke-dasharray: 2 8; stroke-width: 1; animation: spinReverse 60s linear infinite; transform-origin: 0 0; }
+.ring-mid    { stroke: rgba(0, 0, 0, 0.07); }
+.ring-inner  { stroke: rgba(188, 30, 45, 0.22); stroke-width: 1.4; }
 
-.ring-group  { transform-origin: 0 0; animation: spin 90s linear infinite; }
-.ring-dashed { animation: spinReverse 60s linear infinite; transform-origin: 0 0; }
-.ring-outer  { animation: spin 120s linear infinite; transform-origin: 0 0; }
+/* the user-controlled wheel — JS sets transform: rotate() */
+.user-wheel  { transform-origin: 0 0; will-change: transform; }
+.auto-spin   { transform-origin: 0 0; }
 
 .spokes .spoke {
   stroke: url(#spokeGrad);
@@ -192,14 +233,12 @@ body::before {
 }
 
 /* ── ENERGY PARTICLES ── */
-/* particles travel from inner ring (r≈180) to mid ring (r≈300) along each spoke */
 .particle {
   opacity: 0;
   transform-origin: 0 0;
   animation-timing-function: cubic-bezier(0.55, 0.05, 0.6, 1);
   animation-iteration-count: infinite;
 }
-
 .p-top    { animation-name: travelTop;    animation-duration: 3.4s; }
 .p-right  { animation-name: travelRight;  animation-duration: 3.4s; }
 .p-bottom { animation-name: travelBottom; animation-duration: 3.4s; }
@@ -247,9 +286,9 @@ body::before {
   display: grid;
   place-items: center;
   z-index: 5;
+  pointer-events: none; /* let drag pass through to stage */
 }
 
-/* Iconic crimson glow underneath */
 .hub-glow {
   position: absolute;
   inset: -55%;
@@ -265,7 +304,6 @@ body::before {
   50%      { transform: scale(1.10); opacity: 1; }
 }
 
-/* curved seal text wrapper, slowly rotating */
 .hub-curved {
   position: absolute;
   width: calc(var(--logo) * 1.55);
@@ -316,9 +354,9 @@ body::before {
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 }
 
-/* halo pulse */
 .hub-pulse {
   position: absolute;
   inset: -20%;
@@ -333,32 +371,23 @@ body::before {
 .category {
   position: absolute;
   top: 50%; left: 50%;
-  width: min(290px, 86vw);
+  width: min(280px, 86vw);
   text-align: center;
   perspective: 1000px;
   opacity: 0;
-  transition: transform 0.5s var(--ease);
-  animation: cardIn 0.9s var(--ease) var(--delay, 0.1s) forwards;
-  animation-delay: calc(1.1s + var(--delay, 0s));
+  transform: translate(-50%, -50%); /* JS replaces with compass position */
+  animation: cardFadeIn 0.9s var(--ease) calc(1.1s + var(--delay, 0s)) forwards;
   z-index: 4;
 }
-
-/* compass placement around the hub */
-.category-top    { transform: translate(-50%, calc(-50% - var(--r))); }
-.category-right  { transform: translate(calc(-50% + var(--r)), -50%); }
-.category-bottom { transform: translate(-50%, calc(-50% + var(--r))); }
-.category-left   { transform: translate(calc(-50% - var(--r)), -50%); }
-
-/* hover lift — keep translate values exact per side so they stay anchored */
-.category-top:hover    { transform: translate(-50%, calc(-50% - var(--r) - 6px)); }
-.category-right:hover  { transform: translate(calc(-50% + var(--r) + 6px), -50%); }
-.category-bottom:hover { transform: translate(-50%, calc(-50% + var(--r) + 6px)); }
-.category-left:hover   { transform: translate(calc(-50% - var(--r) - 6px), -50%); }
+@keyframes cardFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 /* INNER card — gets the visual styling and the 3D tilt */
 .category-inner {
   position: relative;
-  padding: 22px 22px 18px;
+  padding: 18px 20px 16px;
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
@@ -372,13 +401,12 @@ body::before {
 }
 .category:hover .category-inner {
   box-shadow: var(--shadow-card-hover);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
 }
 
-/* magazine-style number label */
 .category-num {
   position: absolute;
-  top: 14px; right: 18px;
+  top: 12px; right: 16px;
   font-family: 'Cormorant Garamond', serif;
   font-size: 11px;
   font-weight: 600;
@@ -395,16 +423,16 @@ body::before {
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--crimson);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   transform: translateZ(20px);
 }
 .category-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(20px, 2.2vmin, 26px);
+  font-size: clamp(19px, 2.1vmin, 25px);
   font-weight: 700;
   line-height: 1.15;
   color: var(--ink);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   background: linear-gradient(135deg, #0a0a0a 0%, #BC1E2D 130%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -412,21 +440,21 @@ body::before {
   transform: translateZ(30px);
 }
 .category-rule {
-  width: 32px; height: 2px;
+  width: 30px; height: 2px;
   background: var(--crimson);
-  margin: 0 auto 12px;
+  margin: 0 auto 10px;
   border-radius: 2px;
   opacity: 0.85;
   transform: translateZ(20px);
   transition: width 0.4s var(--ease);
 }
-.category:hover .category-rule { width: 56px; }
+.category:hover .category-rule { width: 52px; }
 
 .category-tagline {
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--ink-muted);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   min-height: 38px;
   transform: translateZ(15px);
 }
@@ -456,6 +484,7 @@ body::before {
   transition: transform 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
   white-space: nowrap;
   min-width: 0;
+  cursor: pointer;
 }
 .chip-dot {
   width: 6px; height: 6px;
@@ -543,30 +572,6 @@ body::before {
   0%, 100% { transform: scale(1); opacity: 0.7; }
   50%      { transform: scale(1.18); opacity: 1; }
 }
-@keyframes cardIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.category-top    { animation-name: cardInTop; }
-.category-right  { animation-name: cardInRight; }
-.category-bottom { animation-name: cardInBottom; }
-.category-left   { animation-name: cardInLeft; }
-@keyframes cardInTop {
-  from { opacity: 0; transform: translate(-50%, calc(-50% - var(--r) + 24px)) scale(0.95); }
-  to   { opacity: 1; transform: translate(-50%, calc(-50% - var(--r))) scale(1); }
-}
-@keyframes cardInRight {
-  from { opacity: 0; transform: translate(calc(-50% + var(--r) - 24px), -50%) scale(0.95); }
-  to   { opacity: 1; transform: translate(calc(-50% + var(--r)), -50%) scale(1); }
-}
-@keyframes cardInBottom {
-  from { opacity: 0; transform: translate(-50%, calc(-50% + var(--r) - 24px)) scale(0.95); }
-  to   { opacity: 1; transform: translate(-50%, calc(-50% + var(--r))) scale(1); }
-}
-@keyframes cardInLeft {
-  from { opacity: 0; transform: translate(calc(-50% - var(--r) + 24px), -50%) scale(0.95); }
-  to   { opacity: 1; transform: translate(calc(-50% - var(--r)), -50%) scale(1); }
-}
 
 /* ── RESPONSIVE: collapse flywheel to vertical stack on phones ── */
 @media (max-width: 760px) {
@@ -579,8 +584,10 @@ body::before {
     gap: 22px;
     padding: 84px 18px 88px;
     min-height: auto;
+    cursor: default;
+    touch-action: auto;
   }
-  .flywheel-svg { display: none; }
+  .flywheel-svg, .spin-hint { display: none; }
 
   .hub-center {
     position: relative;
@@ -590,7 +597,6 @@ body::before {
     height: var(--logo);
   }
 
-  /* keep the curved seal text on mobile — it's the brand moment */
   .hub-curved {
     width: calc(var(--logo) * 1.34);
     height: calc(var(--logo) * 1.34);
@@ -600,7 +606,6 @@ body::before {
   .hub-curved text { font-size: 12.5px; letter-spacing: 0.02em; }
   .hub-glow { inset: -35%; }
 
-  /* hero tagline under the logo (mobile only) */
   .hub-tagline {
     display: block;
     grid-row: 2;
@@ -621,12 +626,8 @@ body::before {
     width: 100%;
     max-width: 460px;
     perspective: none;
-    animation: cardInMobile 0.8s var(--ease) var(--delay, 0.1s) forwards;
-    animation-delay: calc(0.6s + var(--delay, 0s));
-  }
-  .category-top, .category-right, .category-bottom, .category-left { transform: none; }
-  .category-top:hover, .category-right:hover, .category-bottom:hover, .category-left:hover {
-    transform: translateY(-4px);
+    transform: none;
+    animation: cardInMobile 0.8s var(--ease) calc(0.6s + var(--delay, 0s)) forwards;
   }
   .category-inner {
     transform: none !important;
@@ -652,7 +653,6 @@ body::before {
   }
   .category-top::before { display: none; }
 
-  /* magazine numbers a touch bigger on mobile, top-left for prominence */
   .category-num {
     top: 16px;
     left: 18px;
@@ -665,7 +665,6 @@ body::before {
   .category-title { font-size: 24px; }
   .category-tagline { min-height: 0; font-size: 13px; padding: 0 4px; }
 
-  /* bump tap targets on touch */
   .chip {
     padding: 10px 14px;
     font-size: 12px;
@@ -677,11 +676,9 @@ body::before {
   .wordmark { font-size: 13px; letter-spacing: 0.32em; }
   .hub-footer { padding: 0 20px 16px; font-size: 10px; letter-spacing: 0.16em; }
 
-  /* lighten the mesh on small screens so cards stay legible */
   .mesh-blob { opacity: 0.42; }
 }
 
-/* tighter still on very narrow phones */
 @media (max-width: 380px) {
   .flywheel-stage { padding: 76px 14px 80px; gap: 20px; }
   .chip { padding: 9px 12px; font-size: 11.5px; }
@@ -690,18 +687,16 @@ body::before {
   .hub-tagline { font-size: 15px; }
 }
 
-/* reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .ring-group, .ring-dashed, .ring-outer, .hub-curved { animation: none !important; }
+  .auto-spin, .ring-outer, .ring-dashed, .hub-curved { animation: none !important; }
   .hub-logo { animation: logoIn 0.4s var(--ease) forwards !important; }
   .hub-pulse, .hub-glow { animation: none !important; opacity: 0.4; }
   .spokes .spoke { animation: drawSpoke 0.4s linear forwards !important; }
   .particle { animation: none !important; opacity: 0 !important; }
   .mesh-blob { animation: none !important; }
-  .category { animation-duration: 0.4s !important; }
+  .spin-hint { animation: none !important; opacity: 0 !important; }
 }
 
-/* focus-visible for keyboard users */
 .chip:focus-visible {
   outline: 2px solid var(--crimson);
   outline-offset: 3px;
