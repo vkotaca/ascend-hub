@@ -118,6 +118,9 @@ body::before {
   margin-left: 4px;
 }
 
+/* hidden on desktop, shown in mobile media query */
+.hub-tagline { display: none; }
+
 /* ── FOOTER ── */
 .hub-footer {
   position: fixed; bottom: 0; left: 0; right: 0;
@@ -135,7 +138,7 @@ body::before {
 
 /* ── FLYWHEEL STAGE ── */
 .flywheel-stage {
-  --r: clamp(230px, 34vmin, 360px);
+  --r: clamp(280px, 42vmin, 440px);
   --logo: clamp(140px, 20vmin, 210px);
   position: relative;
   width: 100%;
@@ -568,22 +571,48 @@ body::before {
 /* ── RESPONSIVE: collapse flywheel to vertical stack on phones ── */
 @media (max-width: 760px) {
   .flywheel-stage {
+    --logo: clamp(130px, 36vw, 170px);
     --r: 0px;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto auto;
     place-items: center;
-    gap: 18px;
-    padding: 110px 16px 80px;
+    gap: 22px;
+    padding: 84px 18px 88px;
     min-height: auto;
   }
-  .flywheel-svg, .hub-curved { display: none; }
+  .flywheel-svg { display: none; }
 
   .hub-center {
     position: relative;
     grid-row: 1;
-    margin-bottom: 8px;
-    width: clamp(120px, 38vw, 170px);
-    height: clamp(120px, 38vw, 170px);
+    margin-bottom: 10px;
+    width: var(--logo);
+    height: var(--logo);
+  }
+
+  /* keep the curved seal text on mobile — it's the brand moment */
+  .hub-curved {
+    width: calc(var(--logo) * 1.34);
+    height: calc(var(--logo) * 1.34);
+    margin-top: calc(var(--logo) * -0.67);
+    margin-left: calc(var(--logo) * -0.67);
+  }
+  .hub-curved text { font-size: 12.5px; letter-spacing: 0.02em; }
+  .hub-glow { inset: -35%; }
+
+  /* hero tagline under the logo (mobile only) */
+  .hub-tagline {
+    display: block;
+    grid-row: 2;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--ink-muted);
+    text-align: center;
+    margin: -2px 0 8px;
+    opacity: 0;
+    animation: fadeUp 1s var(--ease) 1.2s forwards;
   }
 
   .category {
@@ -599,22 +628,66 @@ body::before {
   .category-top:hover, .category-right:hover, .category-bottom:hover, .category-left:hover {
     transform: translateY(-4px);
   }
-  .category-inner { transform: none !important; }
+  .category-inner {
+    transform: none !important;
+    padding: 26px 22px 22px;
+  }
   @keyframes cardInMobile {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .hub-header { padding-top: 22px; }
-  .wordmark { font-size: 14px; letter-spacing: 0.34em; }
-  .category-title { font-size: 22px; }
-  .category-tagline { min-height: 0; }
+  /* dashed spine connector between stacked cards */
+  .category::before {
+    content: '';
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    width: 1px;
+    height: 22px;
+    background-image: linear-gradient(to bottom, rgba(188, 30, 45, 0.55) 50%, transparent 50%);
+    background-size: 1px 6px;
+    background-repeat: repeat-y;
+    pointer-events: none;
+  }
+  .category-top::before { display: none; }
+
+  /* magazine numbers a touch bigger on mobile, top-left for prominence */
+  .category-num {
+    top: 16px;
+    left: 18px;
+    right: auto;
+    font-size: 13px;
+    letter-spacing: 0.20em;
+    opacity: 0.65;
+  }
+
+  .category-title { font-size: 24px; }
+  .category-tagline { min-height: 0; font-size: 13px; padding: 0 4px; }
+
+  /* bump tap targets on touch */
+  .chip {
+    padding: 10px 14px;
+    font-size: 12px;
+    min-height: 38px;
+  }
+  .chips { gap: 7px; }
+
+  .hub-header { padding: 22px 20px 0; }
+  .wordmark { font-size: 13px; letter-spacing: 0.32em; }
+  .hub-footer { padding: 0 20px 16px; font-size: 10px; letter-spacing: 0.16em; }
+
+  /* lighten the mesh on small screens so cards stay legible */
+  .mesh-blob { opacity: 0.42; }
 }
 
 /* tighter still on very narrow phones */
 @media (max-width: 380px) {
-  .chip { padding: 8px 11px; font-size: 11px; }
-  .chips { gap: 5px; }
+  .flywheel-stage { padding: 76px 14px 80px; gap: 20px; }
+  .chip { padding: 9px 12px; font-size: 11.5px; }
+  .chips { gap: 6px; }
+  .category-title { font-size: 22px; }
+  .hub-tagline { font-size: 15px; }
 }
 
 /* reduced motion */
