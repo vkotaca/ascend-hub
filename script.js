@@ -3,6 +3,10 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile      = window.matchMedia('(max-width: 760px)').matches;
+  const hasHover      = window.matchMedia('(hover: hover)').matches;
+
   // generate decorative ticks around the outer ring
   const ticksGroup = document.querySelector('.flywheel-svg .ticks');
   if (ticksGroup) {
@@ -33,11 +37,10 @@
   const stage = document.querySelector('.flywheel-stage');
   const svg = document.querySelector('.flywheel-svg');
   const center = document.querySelector('.hub-center');
-  if (stage && svg && !window.matchMedia('(max-width: 760px)').matches &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (stage && svg && !isMobile && !reducedMotion) {
     let raf = null;
     let tx = 0, ty = 0, targetX = 0, targetY = 0;
-    const max = 14; // px
+    const max = 12;
 
     const onMove = (e) => {
       const rect = stage.getBoundingClientRect();
@@ -65,6 +68,45 @@
     };
 
     window.addEventListener('mousemove', onMove, { passive: true });
+  }
+
+  // 3D card tilt on hover
+  if (hasHover && !isMobile && !reducedMotion) {
+    document.querySelectorAll('.category').forEach((card) => {
+      const inner = card.querySelector('.category-inner');
+      if (!inner) return;
+      let raf = null;
+      let targetX = 0, targetY = 0;
+      let curX = 0, curY = 0;
+      const max = 10;
+
+      const apply = () => {
+        curX += (targetX - curX) * 0.15;
+        curY += (targetY - curY) * 0.15;
+        inner.style.transform =
+          `rotateX(${curY.toFixed(2)}deg) rotateY(${curX.toFixed(2)}deg) translateZ(6px)`;
+        if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+          raf = requestAnimationFrame(apply);
+        } else {
+          raf = null;
+        }
+      };
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        targetX =  x * max;
+        targetY = -y * max;
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        targetX = 0;
+        targetY = 0;
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+    });
   }
 
   // chip ripple — quick scale on click before the new tab opens
