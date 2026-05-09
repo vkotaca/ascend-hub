@@ -448,7 +448,7 @@ body::before {
   background: rgba(255, 255, 255, 0.94);
 }
 
-/* iridescent shimmer ring on hover (#4) */
+/* subtle warm halo on hover (#4) */
 .category-inner::before {
   content: "";
   position: absolute;
@@ -456,20 +456,20 @@ body::before {
   border-radius: 22px;
   background: conic-gradient(
     from 0deg,
-    rgba(255, 90, 110, 0.55),
-    rgba(255, 200, 170, 0.55),
-    rgba(180, 220, 255, 0.55),
-    rgba(180, 110, 255, 0.55),
-    rgba(255, 90, 110, 0.55)
+    rgba(188, 30, 45, 0.32),
+    rgba(255, 170, 160, 0.28),
+    rgba(188, 30, 45, 0.32),
+    rgba(255, 170, 160, 0.28),
+    rgba(188, 30, 45, 0.32)
   );
   z-index: -1;
   opacity: 0;
-  filter: blur(7px);
+  filter: blur(10px);
   transition: opacity 0.5s var(--ease);
-  animation: shimmerRing 7s linear infinite;
+  animation: shimmerRing 9s linear infinite;
   pointer-events: none;
 }
-.category:hover .category-inner::before { opacity: 0.85; }
+.category:hover .category-inner::before { opacity: 0.45; }
 @keyframes shimmerRing {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
