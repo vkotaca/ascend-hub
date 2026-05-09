@@ -467,14 +467,9 @@ body::before {
   opacity: 0;
   filter: blur(10px);
   transition: opacity 0.5s var(--ease);
-  animation: shimmerRing 9s linear infinite;
   pointer-events: none;
 }
 .category:hover .category-inner::before { opacity: 0.45; }
-@keyframes shimmerRing {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
 
 .category-num {
   position: absolute;
