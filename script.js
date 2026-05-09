@@ -209,18 +209,15 @@
     });
   })();
 
-  // generate decorative ticks around the outer ring
-  const ticksGroup = document.querySelector('.flywheel-svg .ticks');
-  if (ticksGroup) {
-    const SVG_NS = 'http://www.w3.org/2000/svg';
-    const innerR = 432;
-    const outerR = 448;
-    const COUNT = 60;
-    for (let i = 0; i < COUNT; i++) {
-      const angle = (i / COUNT) * Math.PI * 2 - Math.PI / 2;
+  // helper: generate decorative tick marks around a ring
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  function generateTicks(group, innerR, outerR, count, baseDelay, majorEvery) {
+    if (!group) return;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
       const cos = Math.cos(angle);
       const sin = Math.sin(angle);
-      const isMajor = i % 5 === 0;
+      const isMajor = (i % majorEvery) === 0;
       const r1 = isMajor ? innerR - 6 : innerR;
       const r2 = outerR;
       const line = document.createElementNS(SVG_NS, 'line');
@@ -230,11 +227,14 @@
       line.setAttribute('y2', (sin * r2).toFixed(2));
       line.style.strokeWidth = isMajor ? '1.6' : '1';
       line.style.opacity = '0';
-      // ticks come in during the cinematic reveal: 2.0s base + ripple
-      line.style.animationDelay = (2.0 + (i / COUNT) * 0.8).toFixed(2) + 's';
-      ticksGroup.appendChild(line);
+      line.style.animationDelay = (baseDelay + (i / count) * 0.8).toFixed(2) + 's';
+      group.appendChild(line);
     }
   }
+  // outer ring ticks (60 — every 6°)
+  generateTicks(document.querySelector('.flywheel-svg .ticks-outer'), 432, 448, 60, 2.0, 5);
+  // middle ring ticks (40 — every 9°), juts outward from r=300
+  generateTicks(document.querySelector('.flywheel-svg .ticks-middle'), 300, 314, 40, 1.6, 4);
 
   const stage = document.querySelector('.flywheel-stage');
   const userWheel = document.querySelector('.flywheel-svg .user-wheel');

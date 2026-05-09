@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=22" />
+  <link rel="stylesheet" href="styles.css?v=23" />
 
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -84,16 +84,21 @@
       <!-- soft red halo behind the center -->
       <circle cx="0" cy="0" r="290" fill="url(#centerGlow)" />
 
-      <!-- auto-spinning decorative outer rings + ticks (independent of user drag) -->
-      <g class="auto-spin">
+      <!-- outer rim — auto-rotates clockwise -->
+      <g class="auto-spin auto-spin-outer">
         <circle cx="0" cy="0" r="460" class="ring ring-outer" />
         <circle cx="0" cy="0" r="380" class="ring ring-dashed" />
-        <g class="ticks"></g>
+        <g class="ticks ticks-outer"></g>
       </g>
 
-      <!-- user-controlled wheel: spokes, particles, inner rings (rotates with drag) -->
-      <g class="user-wheel">
+      <!-- middle rim — auto-rotates counter-clockwise (gear effect) -->
+      <g class="auto-spin auto-spin-middle">
         <circle cx="0" cy="0" r="300" class="ring ring-mid" />
+        <g class="ticks ticks-middle"></g>
+      </g>
+
+      <!-- user-controlled wheel: spokes, particles, inner ring (rotates with drag) -->
+      <g class="user-wheel">
         <circle cx="0" cy="0" r="180" class="ring ring-inner" />
 
         <g class="spokes">
@@ -219,6 +224,6 @@
     <span>© <span id="year"></span> Ascend Speech &amp; Debate</span>
   </footer>
 
-  <script src="script.js?v=22"></script>
+  <script src="script.js?v=23"></script>
 </body>
 </html>

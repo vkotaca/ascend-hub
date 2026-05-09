@@ -244,13 +244,16 @@ body::before {
 .ring { fill: none; stroke: rgba(0, 0, 0, 0.10); stroke-width: 1; }
 .ring-outer  { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; }
 .ring-dashed { stroke: rgba(0, 0, 0, 0.10); stroke-dasharray: 2 8; stroke-width: 1; }
-.ring-mid    { stroke: rgba(0, 0, 0, 0.07); }
+.ring-mid    { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; }
 .ring-inner  { stroke: rgba(188, 30, 45, 0.22); stroke-width: 1.4; }
 
 /* the user-controlled wheel — JS sets transform: rotate() */
 .user-wheel  { transform-origin: 0 0; will-change: transform; }
-/* outer rim (ring-outer, ring-dashed, ticks) drifts counter-clockwise */
-.auto-spin   { transform-origin: 0 0; animation: spinReverse 110s linear infinite; }
+/* three concentric "gears" — outer clockwise, middle counter-clockwise,
+   user-wheel in the center responding to drag */
+.auto-spin         { transform-origin: 0 0; }
+.auto-spin-outer   { animation: spin 130s linear infinite; }
+.auto-spin-middle  { animation: spinReverse 95s linear infinite; }
 
 .spokes .spoke {
   stroke: url(#spokeGrad);
