@@ -98,11 +98,12 @@ body::before {
 /* hidden on desktop, shown in mobile media query */
 .hub-tagline { display: none; }
 
-/* ── SPIN HINT (floating below the center logo) ── */
+/* ── SPIN HINT (floating below the center seal, outside the logo) ── */
 .spin-hint {
+  --hint-y: calc(var(--logo, 200px) * 0.92 + 14px);
   position: absolute;
   top: 50%; left: 50%;
-  transform: translate(-50%, calc(-50% + 38px));
+  transform: translate(-50%, calc(-50% + var(--hint-y)));
   z-index: 6;
   display: flex;
   align-items: center;
@@ -124,11 +125,11 @@ body::before {
   animation: hintRotate 3s linear infinite;
   transform-origin: center;
 }
-@keyframes hintFade { from { opacity: 0; } to { opacity: 0.55; } }
-@keyframes hintOut  { to   { opacity: 0; transform: translate(-50%, calc(-50% + 50px)); } }
+@keyframes hintFade { from { opacity: 0; } to { opacity: 0.6; } }
+@keyframes hintOut  { to   { opacity: 0; transform: translate(-50%, calc(-50% + var(--hint-y) + 12px)); } }
 @keyframes hintFloat {
-  0%, 100% { transform: translate(-50%, calc(-50% + 38px)); }
-  50%      { transform: translate(-50%, calc(-50% + 44px)); }
+  0%, 100% { transform: translate(-50%, calc(-50% + var(--hint-y))); }
+  50%      { transform: translate(-50%, calc(-50% + var(--hint-y) + 6px)); }
 }
 @keyframes hintRotate {
   from { transform: rotate(0deg); }
