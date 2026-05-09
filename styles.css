@@ -235,14 +235,15 @@ body::before {
   overflow: visible;
 }
 .ring { fill: none; stroke: rgba(0, 0, 0, 0.10); stroke-width: 1; }
-.ring-outer  { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; animation: spin 120s linear infinite; transform-origin: 0 0; }
-.ring-dashed { stroke: rgba(0, 0, 0, 0.10); stroke-dasharray: 2 8; stroke-width: 1; animation: spinReverse 60s linear infinite; transform-origin: 0 0; }
+.ring-outer  { stroke: rgba(188, 30, 45, 0.16); stroke-width: 1.4; }
+.ring-dashed { stroke: rgba(0, 0, 0, 0.10); stroke-dasharray: 2 8; stroke-width: 1; }
 .ring-mid    { stroke: rgba(0, 0, 0, 0.07); }
 .ring-inner  { stroke: rgba(188, 30, 45, 0.22); stroke-width: 1.4; }
 
 /* the user-controlled wheel — JS sets transform: rotate() */
 .user-wheel  { transform-origin: 0 0; will-change: transform; }
-.auto-spin   { transform-origin: 0 0; }
+/* outer rim (ring-outer, ring-dashed, ticks) drifts counter-clockwise */
+.auto-spin   { transform-origin: 0 0; animation: spinReverse 110s linear infinite; }
 
 .spokes .spoke {
   stroke: url(#spokeGrad);
@@ -757,7 +758,7 @@ body::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auto-spin, .ring-outer, .ring-dashed, .hub-curved { animation: none !important; }
+  .auto-spin, .hub-curved { animation: none !important; }
   .hub-logo { animation: logoIn 0.4s var(--ease) forwards !important; }
   .hub-pulse, .hub-glow { animation: none !important; opacity: 0.4; }
   .spokes .spoke { animation: drawSpoke 0.4s linear forwards !important; }
