@@ -27,9 +27,16 @@ body {
   font-family: 'DM Sans', system-ui, sans-serif;
   color: var(--ink);
   background: linear-gradient(180deg, #ffffff 0%, #fafafa 60%, #f4f4f4 100%);
-  overflow-x: hidden;
-  min-height: 100vh;
+  overflow: hidden;
+  height: 100vh;
   position: relative;
+}
+html { overflow: hidden; height: 100vh; }
+
+/* mobile gets back its scroll — vertical card stack needs it */
+@media (max-width: 760px) {
+  html, body { overflow: auto; height: auto; min-height: 100vh; }
+  body { overflow-x: hidden; }
 }
 
 body::before {
