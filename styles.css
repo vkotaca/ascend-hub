@@ -362,7 +362,7 @@ body::before {
   top: 50%; left: 50%;
   width: min(280px, 86vw);
   text-align: center;
-  perspective: 1000px;
+  perspective: 600px;
   opacity: 0;
   transform: translate(-50%, -50%); /* JS replaces with compass position */
   animation: cardFadeIn 0.9s var(--ease) calc(1.4s + var(--delay, 0s)) forwards;
@@ -402,7 +402,7 @@ body::before {
   letter-spacing: 0.22em;
   color: var(--crimson);
   opacity: 0.55;
-  transform: translateZ(20px);
+  transform: translateZ(45px);
 }
 
 .category-eyebrow {
@@ -413,7 +413,7 @@ body::before {
   text-transform: uppercase;
   color: var(--crimson);
   margin-bottom: 6px;
-  transform: translateZ(20px);
+  transform: translateZ(40px);
 }
 .category-title {
   font-family: 'Cormorant Garamond', serif;
@@ -426,7 +426,7 @@ body::before {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transform: translateZ(30px);
+  transform: translateZ(70px);
 }
 .category-rule {
   width: 30px; height: 2px;
@@ -434,7 +434,7 @@ body::before {
   margin: 0 auto 10px;
   border-radius: 2px;
   opacity: 0.85;
-  transform: translateZ(20px);
+  transform: translateZ(50px);
   transition: width 0.4s var(--ease);
 }
 .category:hover .category-rule { width: 52px; }
@@ -445,7 +445,7 @@ body::before {
   color: var(--ink-muted);
   margin-bottom: 12px;
   min-height: 38px;
-  transform: translateZ(15px);
+  transform: translateZ(30px);
 }
 
 /* ── CHIPS ── */
@@ -454,7 +454,7 @@ body::before {
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  transform: translateZ(20px);
+  transform: translateZ(50px);
 }
 .chip {
   --chip-bg: rgba(255, 255, 255, 0.9);

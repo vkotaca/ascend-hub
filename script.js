@@ -207,12 +207,12 @@
       if (!inner) return;
       let raf = null;
       let targetX = 0, targetY = 0, curX = 0, curY = 0;
-      const max = 10;
+      const max = 18;
 
       const apply = () => {
         curX += (targetX - curX) * 0.15;
         curY += (targetY - curY) * 0.15;
-        inner.style.transform = `rotateX(${curY.toFixed(2)}deg) rotateY(${curX.toFixed(2)}deg) translateZ(6px)`;
+        inner.style.transform = `rotateX(${curY.toFixed(2)}deg) rotateY(${curX.toFixed(2)}deg) translateZ(16px)`;
         if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
           raf = requestAnimationFrame(apply);
         } else {
