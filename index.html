@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
 
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -39,12 +39,21 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
-  <!-- animated gradient mesh background -->
+  <!-- WebGL crimson aurora behind everything -->
+  <canvas class="aurora-canvas" aria-hidden="true"></canvas>
+
+  <!-- animated gradient mesh background (layers over aurora for soft glow base) -->
   <div class="mesh-bg" aria-hidden="true">
     <div class="mesh-blob mesh-blob-1"></div>
     <div class="mesh-blob mesh-blob-2"></div>
     <div class="mesh-blob mesh-blob-3"></div>
   </div>
+
+  <!-- ambient floating dust particles -->
+  <canvas class="dust-canvas" aria-hidden="true"></canvas>
+
+  <!-- lens-flare burst (triggered on fast spin) -->
+  <div class="lens-flare" aria-hidden="true"></div>
 
   <main class="flywheel-stage" aria-label="Ascend programs">
     <!-- spin hint, floating below center; fades after first interaction -->
@@ -210,6 +219,6 @@
     <span>© <span id="year"></span> Ascend Speech &amp; Debate</span>
   </footer>
 
-  <script src="script.js?v=17"></script>
+  <script src="script.js?v=18"></script>
 </body>
 </html>

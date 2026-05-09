@@ -39,7 +39,58 @@ body::before {
   opacity: 0.32;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  z-index: 2;
+}
+
+/* ── AURORA (WebGL canvas) ── */
+.aurora-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeIn 2.5s var(--ease) 0.3s forwards;
+  mix-blend-mode: screen;
+}
+
+/* ── AMBIENT DUST CANVAS ── */
+.dust-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
   z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeIn 2.5s var(--ease) 0.8s forwards;
+}
+
+/* ── LENS FLARE (fires on fast spin) ── */
+.lens-flare {
+  position: fixed;
+  top: 50%; left: -30%;
+  width: 160%;
+  height: 4px;
+  z-index: 100;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 100% at 50% 50%,
+      rgba(255, 220, 220, 0.95) 0%,
+      rgba(255, 100, 100, 0.7) 25%,
+      rgba(188, 30, 45, 0.5) 50%,
+      transparent 70%);
+  filter: blur(2px);
+  opacity: 0;
+  transform: translateY(-50%) rotate(-18deg) scaleX(0.4);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+.lens-flare.fire { animation: lensFlare 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes lensFlare {
+  0%   { opacity: 0; transform: translateY(-50%) translateX(-30%) rotate(-18deg) scaleX(0.4); }
+  20%  { opacity: 1; }
+  60%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-50%) translateX(40%) rotate(-18deg) scaleX(1.4); }
 }
 
 /* ── ANIMATED GRADIENT MESH BACKGROUND ── */
@@ -162,7 +213,7 @@ body::before {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  z-index: 2;
+  z-index: 3;
   padding: 72px 16px;
   cursor: grab;
   user-select: none;
@@ -395,6 +446,33 @@ body::before {
 .category:hover .category-inner {
   box-shadow: var(--shadow-card-hover);
   background: rgba(255, 255, 255, 0.94);
+}
+
+/* iridescent shimmer ring on hover (#4) */
+.category-inner::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 90, 110, 0.55),
+    rgba(255, 200, 170, 0.55),
+    rgba(180, 220, 255, 0.55),
+    rgba(180, 110, 255, 0.55),
+    rgba(255, 90, 110, 0.55)
+  );
+  z-index: -1;
+  opacity: 0;
+  filter: blur(7px);
+  transition: opacity 0.5s var(--ease);
+  animation: shimmerRing 7s linear infinite;
+  pointer-events: none;
+}
+.category:hover .category-inner::before { opacity: 0.85; }
+@keyframes shimmerRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .category-num {
@@ -685,6 +763,8 @@ body::before {
   .spokes .spoke { animation: drawSpoke 0.4s linear forwards !important; }
   .particle { animation: none !important; opacity: 0 !important; }
   .mesh-blob { animation: none !important; }
+  .aurora-canvas, .dust-canvas { display: none !important; }
+  .category-inner::before { animation: none !important; }
 }
 
 .chip:focus-visible {
