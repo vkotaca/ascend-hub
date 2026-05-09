@@ -95,66 +95,42 @@ body::before {
   50%      { transform: translate(-12%, -6%) scale(1.10); }
 }
 
-/* ── HEADER WORDMARK ── */
-.hub-header {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 3;
-  display: flex; justify-content: flex-start;
-  padding: 26px 32px 0;
-  pointer-events: none;
-}
-.wordmark {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: var(--ink);
-  opacity: 0;
-  animation: fadeDown 1.2s var(--ease) 0.2s forwards;
-  white-space: nowrap;
-}
-.wordmark em {
-  font-style: italic;
-  font-weight: 500;
-  letter-spacing: 0.10em;
-  color: var(--crimson);
-  text-transform: lowercase;
-  margin-left: 4px;
-}
-
 /* hidden on desktop, shown in mobile media query */
 .hub-tagline { display: none; }
 
-/* ── SPIN HINT (bottom-left corner) ── */
+/* ── SPIN HINT (floating below the center logo) ── */
 .spin-hint {
-  position: fixed;
-  bottom: 20px; left: 32px;
-  z-index: 3;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, calc(-50% + 38px));
+  z-index: 6;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--crimson);
   opacity: 0;
   pointer-events: none;
-  animation: fadeUp 1.2s var(--ease) 3.0s forwards;
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  white-space: nowrap;
+  animation: hintFade 1s var(--ease) 2.4s forwards, hintFloat 4s ease-in-out 2.4s infinite;
 }
-.spin-hint.dismissed {
-  opacity: 0 !important;
-  transform: translateY(6px);
-}
+.spin-hint.dismissed { animation: hintOut 0.4s var(--ease) forwards; }
 .spin-hint-arrow {
   display: inline-block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  animation: spinArrow 3s linear infinite;
+  animation: hintRotate 3s linear infinite;
   transform-origin: center;
 }
-@keyframes spinArrow {
+@keyframes hintFade { from { opacity: 0; } to { opacity: 0.55; } }
+@keyframes hintOut  { to   { opacity: 0; transform: translate(-50%, calc(-50% + 50px)); } }
+@keyframes hintFloat {
+  0%, 100% { transform: translate(-50%, calc(-50% + 38px)); }
+  50%      { transform: translate(-50%, calc(-50% + 44px)); }
+}
+@keyframes hintRotate {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
@@ -171,7 +147,7 @@ body::before {
   color: var(--ink-muted);
   opacity: 0;
   pointer-events: none;
-  animation: fadeUp 1.2s var(--ease) 2.8s forwards;
+  animation: fadeUp 1.2s var(--ease) 2.0s forwards;
 }
 
 /* ── FLYWHEEL STAGE ── */
@@ -222,10 +198,10 @@ body::before {
   opacity: 0;
   animation: drawSpoke 1.2s var(--ease) forwards;
 }
-.spokes .spoke:nth-child(1) { animation-delay: 1.55s; }
-.spokes .spoke:nth-child(2) { animation-delay: 1.70s; }
-.spokes .spoke:nth-child(3) { animation-delay: 1.85s; }
-.spokes .spoke:nth-child(4) { animation-delay: 2.00s; }
+.spokes .spoke:nth-child(1) { animation-delay: 0.85s; }
+.spokes .spoke:nth-child(2) { animation-delay: 1.00s; }
+.spokes .spoke:nth-child(3) { animation-delay: 1.15s; }
+.spokes .spoke:nth-child(4) { animation-delay: 1.30s; }
 
 .ticks line {
   stroke: rgba(188, 30, 45, 0.35);
@@ -239,7 +215,7 @@ body::before {
 /* ── ENERGY PARTICLES ── */
 .particles {
   opacity: 0;
-  animation: fadeIn 1s var(--ease) 2.6s forwards;
+  animation: fadeIn 1s var(--ease) 1.9s forwards;
 }
 .particle {
   opacity: 0;
@@ -306,7 +282,7 @@ body::before {
   filter: blur(8px);
   z-index: -2;
   opacity: 0;
-  animation: glowIn 1.4s var(--ease) 0.3s forwards, glowPulse 5s ease-in-out 1.7s infinite;
+  animation: glowIn 1.2s var(--ease) 0.2s forwards, glowPulse 5s ease-in-out 1.4s infinite;
 }
 @keyframes glowIn {
   from { opacity: 0; transform: scale(0.4); }
@@ -326,7 +302,7 @@ body::before {
   margin-left: calc(var(--logo) * -0.775);
   pointer-events: none;
   z-index: 4;
-  animation: spin 70s linear infinite, fadeIn 1.5s var(--ease) 1.0s backwards;
+  animation: spin 70s linear infinite, fadeIn 1.2s var(--ease) 0.6s backwards;
 }
 .hub-curved svg {
   width: 100%;
@@ -359,7 +335,7 @@ body::before {
   place-items: center;
   opacity: 0;
   transform: scale(0.6);
-  animation: logoIn 1.2s var(--ease) 0.5s forwards, breathe 6s ease-in-out 1.7s infinite;
+  animation: logoIn 1.0s var(--ease) 0.3s forwards, breathe 6s ease-in-out 1.3s infinite;
   z-index: 5;
 }
 .hub-logo img {
@@ -389,7 +365,7 @@ body::before {
   perspective: 1000px;
   opacity: 0;
   transform: translate(-50%, -50%); /* JS replaces with compass position */
-  animation: cardFadeIn 1s var(--ease) calc(2.2s + var(--delay, 0s)) forwards;
+  animation: cardFadeIn 0.9s var(--ease) calc(1.4s + var(--delay, 0s)) forwards;
   z-index: 4;
 }
 @keyframes cardFadeIn {
@@ -685,8 +661,6 @@ body::before {
   }
   .chips { gap: 7px; }
 
-  .hub-header { padding: 22px 20px 0; }
-  .wordmark { font-size: 13px; letter-spacing: 0.32em; }
   .hub-footer { padding: 0 20px 16px; font-size: 10px; letter-spacing: 0.16em; }
 
   .mesh-blob { opacity: 0.42; }
@@ -750,46 +724,3 @@ body.fast-spin .hub-logo {
   transition: transform 0.8s var(--ease), background 0.6s var(--ease), fill 0.6s var(--ease), opacity 0.6s var(--ease), stroke 0.6s var(--ease);
 }
 
-/* ── AUDIO TOGGLE ── */
-.audio-toggle {
-  position: fixed;
-  bottom: 18px; right: 18px;
-  z-index: 4;
-  width: 36px; height: 36px;
-  display: grid;
-  place-items: center;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(188, 30, 45, 0.18);
-  border-radius: 50%;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--crimson);
-  font-size: 14px;
-  line-height: 1;
-  opacity: 0;
-  pointer-events: auto;
-  animation: fadeIn 1s var(--ease) 3.0s forwards;
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 0;
-}
-.audio-toggle:hover {
-  background: var(--crimson);
-  color: var(--white);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(188, 30, 45, 0.30);
-  border-color: var(--crimson);
-}
-.audio-icon { display: none; }
-.audio-toggle:not(.muted) .audio-icon-on  { display: block; }
-.audio-toggle.muted        .audio-icon-off { display: block; opacity: 0.5; }
-.audio-toggle.muted { color: var(--ink-muted); border-color: rgba(0,0,0,0.12); }
-
-@media (prefers-reduced-motion: reduce) {
-  .audio-toggle { animation: none !important; opacity: 1 !important; }
-}
-
-@media (max-width: 760px) {
-  .audio-toggle { bottom: 14px; right: 14px; }
-}

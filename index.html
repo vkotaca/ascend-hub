@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -44,11 +44,13 @@
     <div class="mesh-blob mesh-blob-3"></div>
   </div>
 
-  <header class="hub-header">
-    <span class="wordmark">ASCEND <em>Hub</em></span>
-  </header>
-
   <main class="flywheel-stage" aria-label="Ascend programs">
+    <!-- spin hint, floating below center; fades after first interaction -->
+    <div class="spin-hint" aria-hidden="true">
+      <span class="spin-hint-arrow">↻</span>
+      <span>Drag to spin</span>
+    </div>
+
     <!-- Decorative rings, spokes, and energy particles -->
     <svg class="flywheel-svg" viewBox="-500 -500 1000 1000" aria-hidden="true" focusable="false">
       <defs>
@@ -206,20 +208,10 @@
     </article>
   </main>
 
-  <aside class="spin-hint" aria-hidden="true">
-    <span class="spin-hint-arrow">↻</span>
-    <span>Drag to spin</span>
-  </aside>
-
-  <button class="audio-toggle" type="button" aria-label="Toggle sound" aria-pressed="false">
-    <span class="audio-icon audio-icon-on" aria-hidden="true">♪</span>
-    <span class="audio-icon audio-icon-off" aria-hidden="true">⊘</span>
-  </button>
-
   <footer class="hub-footer">
     <span>© <span id="year"></span> Ascend Speech &amp; Debate</span>
   </footer>
 
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>
