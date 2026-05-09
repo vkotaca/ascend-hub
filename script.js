@@ -56,27 +56,48 @@
     return isFinite(v) ? v : 280;
   }
 
-  function applyWheel() {
+  // ── shared parallax + tilt state, used by both wheel rotation and cursor parallax
+  let parX = 0, parY = 0;       // SVG/center translate offset
+  let tiltX = 0, tiltY = 0;     // wheel tilt (deg) — rotateX, rotateY
+
+  const svgEl = document.querySelector('.flywheel-svg');
+  const centerEl = document.querySelector('.hub-center');
+
+  function render() {
     if (!stage) return;
     if (isMobileLayout()) {
-      // clear any inline transforms left over from desktop layout
       cards.forEach((c) => { c.style.transform = ''; });
       if (userWheel) userWheel.style.transform = '';
+      if (svgEl) svgEl.style.transform = '';
+      if (centerEl) centerEl.style.transform = '';
       return;
     }
     const r = getR();
+    const tilt = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
     cards.forEach((card, i) => {
       const a = (baseAngles[i] + theta) * Math.PI / 180;
       const x = r * Math.cos(a);
       const y = r * Math.sin(a);
-      card.style.transform = `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px))`;
+      card.style.transform =
+        `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px)) ${tilt}`;
     });
+    if (svgEl) {
+      svgEl.style.transform =
+        `translate(calc(-50% + ${parX.toFixed(2)}px), calc(-50% + ${parY.toFixed(2)}px)) ${tilt}`;
+    }
+    if (centerEl) {
+      centerEl.style.transform =
+        `translate(${(parX * 0.4).toFixed(2)}px, ${(parY * 0.4).toFixed(2)}px) ${tilt}`;
+    }
     if (userWheel) userWheel.style.transform = `rotate(${theta}deg)`;
   }
 
+  // legacy alias (still called from drag/inertia handlers)
+  const applyWheel = render;
+
   // initial paint after layout settles
-  requestAnimationFrame(applyWheel);
-  window.addEventListener('resize', applyWheel);
+  requestAnimationFrame(render);
+  window.addEventListener('resize', render);
 
   // ── FAST-SPIN EASTER EGG ──
   function triggerFastSpin() {
@@ -163,41 +184,53 @@
     stage.addEventListener('pointercancel', endDrag);
   }
 
-  // ── SUBTLE PARALLAX (skipped while dragging) ──
-  const svg = document.querySelector('.flywheel-svg');
-  const center = document.querySelector('.hub-center');
-  if (stage && svg && !reducedMotion) {
+  // ── CURSOR PARALLAX + WHEEL TILT (skipped while dragging) ──
+  if (stage && !reducedMotion) {
     let raf = null;
-    let tx = 0, ty = 0, targetX = 0, targetY = 0;
-    const max = 10;
+    let targetParX = 0, targetParY = 0;
+    let targetTiltX = 0, targetTiltY = 0;
+    const PAR_MAX = 8;     // SVG/center translate range
+    const TILT_MAX = 11;   // wheel tilt in degrees
 
     const onMove = (e) => {
       if (isMobileLayout() || dragging) return;
       const rect = stage.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / rect.width;
-      const dy = (e.clientY - cy) / rect.height;
-      targetX = dx * max;
-      targetY = dy * max;
+      // -1..1 normalized cursor offset from center
+      const ndx = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+      const ndy = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
+      targetParX = ndx * PAR_MAX;
+      targetParY = ndy * PAR_MAX;
+      // tilt: cursor right -> wheel rotates around Y (right side moves away);
+      //       cursor down -> wheel tilts forward toward viewer (negate)
+      targetTiltY = ndx * TILT_MAX;
+      targetTiltX = -ndy * TILT_MAX;
       if (!raf) raf = requestAnimationFrame(tick);
     };
 
     const tick = () => {
-      tx += (targetX - tx) * 0.08;
-      ty += (targetY - ty) * 0.08;
-      svg.style.transform = `translate(calc(-50% + ${tx.toFixed(2)}px), calc(-50% + ${ty.toFixed(2)}px))`;
-      if (center) {
-        center.style.transform = `translate(${(tx * 0.4).toFixed(2)}px, ${(ty * 0.4).toFixed(2)}px)`;
-      }
-      if (Math.abs(targetX - tx) > 0.05 || Math.abs(targetY - ty) > 0.05) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        raf = null;
-      }
+      parX  += (targetParX  - parX)  * 0.08;
+      parY  += (targetParY  - parY)  * 0.08;
+      tiltX += (targetTiltX - tiltX) * 0.08;
+      tiltY += (targetTiltY - tiltY) * 0.08;
+      render();
+      const settled =
+        Math.abs(targetParX  - parX)  < 0.05 &&
+        Math.abs(targetParY  - parY)  < 0.05 &&
+        Math.abs(targetTiltX - tiltX) < 0.05 &&
+        Math.abs(targetTiltY - tiltY) < 0.05;
+      raf = settled ? null : requestAnimationFrame(tick);
     };
 
     window.addEventListener('mousemove', onMove, { passive: true });
+
+    // when the cursor leaves the window, ease the tilt back to neutral
+    document.addEventListener('mouseleave', () => {
+      targetParX = 0; targetParY = 0;
+      targetTiltX = 0; targetTiltY = 0;
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
   }
 
   // ── 3D card tilt on hover (skipped while dragging) ──

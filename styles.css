@@ -167,6 +167,9 @@ body::before {
   cursor: grab;
   user-select: none;
   touch-action: none;
+  /* establish a 3D scene so the entire wheel can tilt on cursor */
+  perspective: 1500px;
+  perspective-origin: 50% 50%;
 }
 .flywheel-stage.dragging { cursor: grabbing; }
 
