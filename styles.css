@@ -53,26 +53,32 @@ body::before {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.55;
+  opacity: 0;
   will-change: transform;
+  animation-fill-mode: forwards;
 }
+.mesh-blob-1, .mesh-blob-2, .mesh-blob-3 { animation-fill-mode: forwards; }
 .mesh-blob-1 {
   width: 60vmax; height: 60vmax;
   top: -10%; left: -15%;
   background: radial-gradient(circle, rgba(188, 30, 45, 0.18) 0%, rgba(188, 30, 45, 0) 70%);
-  animation: drift1 32s ease-in-out infinite;
+  animation: meshIn 1.4s ease-out 0.0s forwards, drift1 32s ease-in-out 1.4s infinite;
 }
 .mesh-blob-2 {
   width: 55vmax; height: 55vmax;
   bottom: -15%; right: -10%;
   background: radial-gradient(circle, rgba(188, 30, 45, 0.14) 0%, rgba(188, 30, 45, 0) 70%);
-  animation: drift2 38s ease-in-out infinite;
+  animation: meshIn 1.4s ease-out 0.2s forwards, drift2 38s ease-in-out 1.6s infinite;
 }
 .mesh-blob-3 {
   width: 45vmax; height: 45vmax;
   top: 30%; left: 60%;
   background: radial-gradient(circle, rgba(255, 200, 200, 0.18) 0%, rgba(255, 200, 200, 0) 70%);
-  animation: drift3 44s ease-in-out infinite;
+  animation: meshIn 1.4s ease-out 0.4s forwards, drift3 44s ease-in-out 1.8s infinite;
+}
+@keyframes meshIn {
+  from { opacity: 0; }
+  to   { opacity: 0.55; }
 }
 @keyframes drift1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -134,7 +140,7 @@ body::before {
   color: var(--crimson);
   opacity: 0;
   pointer-events: none;
-  animation: fadeUp 1.2s var(--ease) 1.6s forwards;
+  animation: fadeUp 1.2s var(--ease) 3.0s forwards;
   transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
 }
 .spin-hint.dismissed {
@@ -165,7 +171,7 @@ body::before {
   color: var(--ink-muted);
   opacity: 0;
   pointer-events: none;
-  animation: fadeUp 1.2s var(--ease) 1.4s forwards;
+  animation: fadeUp 1.2s var(--ease) 2.8s forwards;
 }
 
 /* ── FLYWHEEL STAGE ── */
@@ -216,10 +222,10 @@ body::before {
   opacity: 0;
   animation: drawSpoke 1.2s var(--ease) forwards;
 }
-.spokes .spoke:nth-child(1) { animation-delay: 0.55s; }
-.spokes .spoke:nth-child(2) { animation-delay: 0.70s; }
-.spokes .spoke:nth-child(3) { animation-delay: 0.85s; }
-.spokes .spoke:nth-child(4) { animation-delay: 1.00s; }
+.spokes .spoke:nth-child(1) { animation-delay: 1.55s; }
+.spokes .spoke:nth-child(2) { animation-delay: 1.70s; }
+.spokes .spoke:nth-child(3) { animation-delay: 1.85s; }
+.spokes .spoke:nth-child(4) { animation-delay: 2.00s; }
 
 .ticks line {
   stroke: rgba(188, 30, 45, 0.35);
@@ -227,9 +233,14 @@ body::before {
   stroke-linecap: round;
   opacity: 0;
   animation: tickIn 0.6s var(--ease) forwards;
+  /* per-line delay set inline by JS, with a 2s base offset for cinematic reveal */
 }
 
 /* ── ENERGY PARTICLES ── */
+.particles {
+  opacity: 0;
+  animation: fadeIn 1s var(--ease) 2.6s forwards;
+}
 .particle {
   opacity: 0;
   transform-origin: 0 0;
@@ -294,7 +305,12 @@ body::before {
     radial-gradient(circle, rgba(188, 30, 45, 0.30) 0%, rgba(188, 30, 45, 0.08) 35%, transparent 65%);
   filter: blur(8px);
   z-index: -2;
-  animation: glowPulse 5s ease-in-out infinite;
+  opacity: 0;
+  animation: glowIn 1.4s var(--ease) 0.3s forwards, glowPulse 5s ease-in-out 1.7s infinite;
+}
+@keyframes glowIn {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 0.85; transform: scale(1); }
 }
 @keyframes glowPulse {
   0%, 100% { transform: scale(1); opacity: 0.85; }
@@ -310,7 +326,7 @@ body::before {
   margin-left: calc(var(--logo) * -0.775);
   pointer-events: none;
   z-index: 4;
-  animation: spin 70s linear infinite, fadeIn 2s var(--ease) 0.6s backwards;
+  animation: spin 70s linear infinite, fadeIn 1.5s var(--ease) 1.0s backwards;
 }
 .hub-curved svg {
   width: 100%;
@@ -343,7 +359,7 @@ body::before {
   place-items: center;
   opacity: 0;
   transform: scale(0.6);
-  animation: logoIn 1.0s var(--ease) 0.15s forwards, breathe 6s ease-in-out 1.4s infinite;
+  animation: logoIn 1.2s var(--ease) 0.5s forwards, breathe 6s ease-in-out 1.7s infinite;
   z-index: 5;
 }
 .hub-logo img {
@@ -373,7 +389,7 @@ body::before {
   perspective: 1000px;
   opacity: 0;
   transform: translate(-50%, -50%); /* JS replaces with compass position */
-  animation: cardFadeIn 0.9s var(--ease) calc(1.1s + var(--delay, 0s)) forwards;
+  animation: cardFadeIn 1s var(--ease) calc(2.2s + var(--delay, 0s)) forwards;
   z-index: 4;
 }
 @keyframes cardFadeIn {
@@ -696,4 +712,84 @@ body::before {
 .chip:focus-visible {
   outline: 2px solid var(--crimson);
   outline-offset: 3px;
+}
+
+/* ── FAST-SPIN EASTER EGG ── */
+/* When the user spins the wheel fast, the center glows hotter,
+   the seal text pops, and the inner ring gets brighter. */
+body.fast-spin .hub-glow {
+  background:
+    radial-gradient(circle, rgba(188, 30, 45, 0.55) 0%, rgba(188, 30, 45, 0.16) 35%, transparent 65%);
+  transform: scale(1.18);
+  transition: transform 0.6s var(--ease), background 0.4s var(--ease);
+}
+body.fast-spin .hub-pulse {
+  background: radial-gradient(circle, rgba(188, 30, 45, 0.45) 0%, transparent 60%);
+  transform: scale(1.15);
+  transition: transform 0.6s var(--ease), background 0.4s var(--ease);
+}
+body.fast-spin .hub-curved text {
+  fill: var(--crimson-light);
+  opacity: 1;
+  transition: fill 0.4s var(--ease), opacity 0.4s var(--ease);
+}
+body.fast-spin .ring-inner { stroke: rgba(188, 30, 45, 0.55); transition: stroke 0.4s var(--ease); }
+body.fast-spin .ring-mid   { stroke: rgba(188, 30, 45, 0.20); transition: stroke 0.4s var(--ease); }
+body.fast-spin .hub-logo {
+  box-shadow:
+    0 0 0 1px rgba(188, 30, 45, 0.45),
+    0 0 0 6px var(--white),
+    0 0 0 7px rgba(188, 30, 45, 0.55),
+    0 50px 130px rgba(188, 30, 45, 0.55),
+    0 14px 36px rgba(20, 20, 20, 0.20) !important;
+  transition: box-shadow 0.5s var(--ease);
+}
+
+/* smooth return when fast-spin class is removed */
+.hub-glow, .hub-pulse, .hub-curved text, .ring-inner, .ring-mid {
+  transition: transform 0.8s var(--ease), background 0.6s var(--ease), fill 0.6s var(--ease), opacity 0.6s var(--ease), stroke 0.6s var(--ease);
+}
+
+/* ── AUDIO TOGGLE ── */
+.audio-toggle {
+  position: fixed;
+  bottom: 18px; right: 18px;
+  z-index: 4;
+  width: 36px; height: 36px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(188, 30, 45, 0.18);
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--crimson);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: auto;
+  animation: fadeIn 1s var(--ease) 3.0s forwards;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0;
+}
+.audio-toggle:hover {
+  background: var(--crimson);
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(188, 30, 45, 0.30);
+  border-color: var(--crimson);
+}
+.audio-icon { display: none; }
+.audio-toggle:not(.muted) .audio-icon-on  { display: block; }
+.audio-toggle.muted        .audio-icon-off { display: block; opacity: 0.5; }
+.audio-toggle.muted { color: var(--ink-muted); border-color: rgba(0,0,0,0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-toggle { animation: none !important; opacity: 1 !important; }
+}
+
+@media (max-width: 760px) {
+  .audio-toggle { bottom: 14px; right: 14px; }
 }

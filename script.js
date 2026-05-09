@@ -28,7 +28,8 @@
       line.setAttribute('y2', (sin * r2).toFixed(2));
       line.style.strokeWidth = isMajor ? '1.6' : '1';
       line.style.opacity = '0';
-      line.style.animationDelay = (1.1 + (i / COUNT) * 0.8).toFixed(2) + 's';
+      // ticks come in during the cinematic reveal: 2.0s base + ripple
+      line.style.animationDelay = (2.0 + (i / COUNT) * 0.8).toFixed(2) + 's';
       ticksGroup.appendChild(line);
     }
   }
@@ -46,6 +47,10 @@
   let inertiaRaf = null;
   let lastPointerAngle = 0;
   let dragMoved = 0;      // accumulated drag distance to know "real" drag
+  let lastTickTheta = -45; // track 90° crossings for whoosh sound
+  let fastSpinTimer = null;
+  const FAST_SPIN_THRESHOLD = 6.5; // deg per frame ≈ 1 rev / sec
+  const TICK_INTERVAL = 90;        // degrees between whoosh sounds (one per card slot)
 
   function getR() {
     if (!stage) return 280;
@@ -75,6 +80,99 @@
   requestAnimationFrame(applyWheel);
   window.addEventListener('resize', applyWheel);
 
+  // ── AUDIO: subtle whoosh on each 90° card-pass ──
+  let audioCtx = null;
+  let audioMuted = (function () {
+    try { return localStorage.getItem('hub-audio-muted') === '1'; } catch (_) { return false; }
+  })();
+  // default: muted on first visit (don't surprise people with sound)
+  // user opts in via the speaker icon
+  if (!audioMuted && (function () { try { return localStorage.getItem('hub-audio-muted') === null; } catch (_) { return true; } })()) {
+    audioMuted = true;
+  }
+
+  const audioToggle = document.querySelector('.audio-toggle');
+  function syncAudioToggle() {
+    if (!audioToggle) return;
+    audioToggle.classList.toggle('muted', audioMuted);
+    audioToggle.setAttribute('aria-pressed', audioMuted ? 'false' : 'true');
+    audioToggle.title = audioMuted ? 'Sound off — click to enable' : 'Sound on — click to mute';
+  }
+  syncAudioToggle();
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (_) { audioCtx = null; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playWhoosh(intensity = 1) {
+    if (audioMuted || !audioCtx || reducedMotion) return;
+    const now = audioCtx.currentTime;
+    const duration = 0.18;
+    const bufSize = Math.floor(audioCtx.sampleRate * duration);
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1100, now);
+    filter.frequency.exponentialRampToValueAtTime(220, now + duration);
+    filter.Q.value = 0.6;
+    const gain = audioCtx.createGain();
+    const peak = Math.min(0.18, 0.06 + 0.02 * intensity);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(peak, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0005, now + duration);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    src.start(now);
+    src.stop(now + duration + 0.02);
+  }
+
+  if (audioToggle) {
+    audioToggle.addEventListener('click', () => {
+      audioMuted = !audioMuted;
+      try { localStorage.setItem('hub-audio-muted', audioMuted ? '1' : '0'); } catch (_) {}
+      syncAudioToggle();
+      if (!audioMuted) {
+        ensureAudio();
+        // confirm with a single soft whoosh so user hears it works
+        setTimeout(() => playWhoosh(1.5), 30);
+      }
+    });
+  }
+
+  // ── FAST-SPIN EASTER EGG ──
+  function triggerFastSpin() {
+    document.body.classList.add('fast-spin');
+    if (fastSpinTimer) clearTimeout(fastSpinTimer);
+    fastSpinTimer = setTimeout(() => {
+      document.body.classList.remove('fast-spin');
+      fastSpinTimer = null;
+    }, 600);
+  }
+
+  function checkRotationEffects() {
+    // whoosh on 90° crossings
+    while (Math.abs(theta - lastTickTheta) >= TICK_INTERVAL) {
+      const dir = theta > lastTickTheta ? 1 : -1;
+      lastTickTheta += dir * TICK_INTERVAL;
+      const intensity = Math.min(3, Math.abs(velocity) / 2);
+      playWhoosh(intensity);
+    }
+    // hot-spin glow when above threshold
+    if (Math.abs(velocity) >= FAST_SPIN_THRESHOLD) {
+      triggerFastSpin();
+    }
+  }
+
   // ── DRAG / INERTIA ──
   function pointerAngle(e) {
     const rect = stage.getBoundingClientRect();
@@ -89,6 +187,7 @@
       theta += velocity;
       velocity *= 0.95;
       applyWheel();
+      checkRotationEffects();
       inertiaRaf = requestAnimationFrame(inertiaLoop);
     } else {
       inertiaRaf = null;
@@ -108,6 +207,8 @@
       dragMoved = 0;
       velocity = 0;
       lastPointerAngle = pointerAngle(e);
+      lastTickTheta = theta; // reset tick reference so first whoosh fires after a full slot
+      ensureAudio();         // first-gesture audio init (browser policy)
       stage.classList.add('dragging');
       try { stage.setPointerCapture(e.pointerId); } catch (_) {}
       e.preventDefault();
@@ -127,6 +228,7 @@
       }
       lastPointerAngle = a;
       applyWheel();
+      checkRotationEffects();
     });
 
     function endDrag(e) {
