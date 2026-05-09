@@ -40,7 +40,7 @@
   const baseAngles = cards.map((c) => parseFloat(c.dataset.baseAngle) || 0);
 
   // ── ROTATION STATE ──
-  let theta = 0;          // degrees
+  let theta = -45;        // degrees — start cards at the corners (NE/SE/SW/NW)
   let velocity = 0;       // degrees per frame
   let dragging = false;
   let inertiaRaf = null;
