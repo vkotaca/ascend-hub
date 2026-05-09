@@ -135,42 +135,6 @@ body::before {
   animation: fadeUp 1.2s var(--ease) 1.4s forwards;
 }
 
-/* ── SPIN HINT ── */
-.spin-hint {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, calc(-50% + 38px));
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--crimson);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 6;
-  animation: hintFade 1s var(--ease) 2.6s forwards, hintFloat 4s ease-in-out 2.6s infinite;
-  white-space: nowrap;
-}
-.spin-hint.dismissed { animation: hintOut 0.4s var(--ease) forwards; }
-.spin-hint-arrow {
-  display: inline-block;
-  font-size: 13px;
-  animation: hintRotate 3s linear infinite;
-  transform-origin: center;
-}
-@keyframes hintFade { from { opacity: 0; } to { opacity: 0.55; } }
-@keyframes hintOut  { to   { opacity: 0; transform: translate(-50%, calc(-50% + 50px)); } }
-@keyframes hintFloat {
-  0%, 100% { transform: translate(-50%, calc(-50% + 38px)); }
-  50%      { transform: translate(-50%, calc(-50% + 44px)); }
-}
-@keyframes hintRotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
 /* ── FLYWHEEL STAGE ── */
 .flywheel-stage {
   /* cap radius by both vmin (horizontal fit) AND vh (vertical fit)
@@ -587,7 +551,7 @@ body::before {
     cursor: default;
     touch-action: auto;
   }
-  .flywheel-svg, .spin-hint { display: none; }
+  .flywheel-svg { display: none; }
 
   .hub-center {
     position: relative;
@@ -694,7 +658,6 @@ body::before {
   .spokes .spoke { animation: drawSpoke 0.4s linear forwards !important; }
   .particle { animation: none !important; opacity: 0 !important; }
   .mesh-blob { animation: none !important; }
-  .spin-hint { animation: none !important; opacity: 0 !important; }
 }
 
 .chip:focus-visible {

@@ -36,7 +36,6 @@
   const stage = document.querySelector('.flywheel-stage');
   const userWheel = document.querySelector('.flywheel-svg .user-wheel');
   const cards = Array.from(document.querySelectorAll('.category'));
-  const spinHint = document.querySelector('.spin-hint');
   const baseAngles = cards.map((c) => parseFloat(c.dataset.baseAngle) || 0);
 
   // ── ROTATION STATE ──
@@ -100,12 +99,6 @@
     return !target.closest('a');
   }
 
-  function dismissHint() {
-    if (spinHint && !spinHint.classList.contains('dismissed')) {
-      spinHint.classList.add('dismissed');
-    }
-  }
-
   if (stage) {
     stage.addEventListener('pointerdown', (e) => {
       if (isMobileLayout()) return;
@@ -128,7 +121,6 @@
       theta += delta;
       velocity = delta * 0.6;
       dragMoved += Math.abs(delta);
-      if (dragMoved > 3) dismissHint();
       lastPointerAngle = a;
       applyWheel();
     });
