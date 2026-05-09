@@ -120,6 +120,39 @@ body::before {
 /* hidden on desktop, shown in mobile media query */
 .hub-tagline { display: none; }
 
+/* ── SPIN HINT (bottom-left corner) ── */
+.spin-hint {
+  position: fixed;
+  bottom: 20px; left: 32px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  opacity: 0;
+  pointer-events: none;
+  animation: fadeUp 1.2s var(--ease) 1.6s forwards;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.spin-hint.dismissed {
+  opacity: 0 !important;
+  transform: translateY(6px);
+}
+.spin-hint-arrow {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  animation: spinArrow 3s linear infinite;
+  transform-origin: center;
+}
+@keyframes spinArrow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ── FOOTER ── */
 .hub-footer {
   position: fixed; bottom: 0; left: 0; right: 0;
@@ -551,7 +584,7 @@ body::before {
     cursor: default;
     touch-action: auto;
   }
-  .flywheel-svg { display: none; }
+  .flywheel-svg, .spin-hint { display: none; }
 
   .hub-center {
     position: relative;
