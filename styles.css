@@ -366,7 +366,7 @@ body::before {
   perspective: 600px;
   opacity: 0;
   transform: translate(-50%, -50%); /* JS replaces with compass position */
-  animation: cardFadeIn 0.9s var(--ease) calc(1.4s + var(--delay, 0s)) forwards;
+  animation: cardFadeIn 1s var(--ease) calc(0.3s + var(--delay, 0s)) forwards;
   z-index: 4;
 }
 @keyframes cardFadeIn {
