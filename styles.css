@@ -814,3 +814,16 @@ body.fast-spin .hub-logo {
   transition: transform 0.8s var(--ease), background 0.6s var(--ease), fill 0.6s var(--ease), opacity 0.6s var(--ease), stroke 0.6s var(--ease);
 }
 
+
+/* Present to assistive tech and to crawlers, absent from the layout. Used by
+   the page h1, which the flywheel design has nowhere to show. */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

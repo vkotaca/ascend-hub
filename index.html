@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="styles.css?v=24" />
 
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
@@ -57,6 +57,12 @@
   <div class="lens-flare" aria-hidden="true"></div>
 
   <main class="flywheel-stage" aria-label="Ascend programs">
+    <!-- The page's heading. The flywheel renders the brand as a logo image and
+         the only headings in the markup are the four category h2s, so this page
+         had no h1 at all: nothing told a crawler or a screen reader what it is.
+         Hidden rather than shown because the design has no place for a line of
+         heading text over the flywheel. -->
+    <h1 class="visually-hidden">Ascend Hub &mdash; every Ascend program in one place</h1>
     <!-- spin hint, floating below center; fades after first interaction -->
     <div class="spin-hint" aria-hidden="true">
       <span class="spin-hint-arrow">↻</span>
